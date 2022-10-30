@@ -71,64 +71,34 @@ class PhasePurityAnalyzer
 {
 public:
 
-    void analyzePhaseStability(const FlyingPhasorElementBufferTypePtr & pBuf, size_t nSamples,
-                               double radiansPerSamplePerSample )
+    void analyzePhaseStability( const FlyingPhasorElementBufferTypePtr & pBuf, size_t nSamples,
+                                double radiansPerSamplePerSample )
     {
         // Reset stats in case an instance is re-run.
         statsStateMachine.reset();
 
-        auto phaseAccumulator = 0.0;
-        for ( size_t n=0; nSamples != n; ++n )
+        // The tracking radian per sample rate gets initialized to radians per sample, per sample (negated).
+        // It gets to zero on the after first iteration and used second iteration onward.
+        auto trackingRadiansPerSample = -radiansPerSamplePerSample;
+        for ( size_t n=0; nSamples != n; ++n, trackingRadiansPerSample += radiansPerSamplePerSample )
         {
+
             // We cheat the first sample because there is no previous one in order to compute
-            // a delta. We assume zero error in that case.
-            // Otherwise, (n not zero), we compute an error based on where we should have advanced to.
-            auto phaseError = 0.0;
-            if ( n )
+            // a delta.
+            if ( 0 == n )
             {
-                const auto phase = std::arg(pBuf[ n ] );
-                auto expectedAngle = fmod( phaseAccumulator, 2 * M_PI );
-                if ( M_PI < expectedAngle )
-                    expectedAngle -= 2 * M_PI;
-                phaseError = deltaAngle(expectedAngle, phase );
+                statsStateMachine.addSample( radiansPerSamplePerSample );
             }
-
-#if 0
-            // If the phaseDelta is far too far off of radiansPerSamplePerSample. This is an obvious failure.
-            // We are trying to catch the oddball here as a few oddballs may not create much variance.
-            // Variance we check later.
-            if ( !inTolerance( phaseDelta, radiansPerSamplePerSample, 1e-12 ) )
+            else
             {
-                std::cout << "Phase error at sample: " << n << "! Expected: " << radiansPerSamplePerSample
-                          << ", Detected: " << phaseDelta << std::endl;
-                retCode = 2;
-                break;
+                const auto testSamplePhase = std::arg( pBuf[ n ] );
+                const auto prevTestSamplePhase = std::arg(pBuf[ n-1 ] );
+
+                const auto radiansPerSample = deltaAngle(prevTestSamplePhase, testSamplePhase );
+                const auto accel =  radiansPerSample - trackingRadiansPerSample;
+                statsStateMachine.addSample( accel );
             }
-#endif
-            // Run stats state machine for overall mean and variance check.
-            statsStateMachine.addSample( phaseError );
-
-            // Update Phase Accumulator
-            phaseAccumulator += radiansPerSamplePerSample*(n+1);
         }
-
-#if 0
-        // Now test the statistics look good.
-        auto rateStats = statsStateMachine.getStats();
-        if ( !inTolerance( rateStats.first, radiansPerSamplePerSample, 1e-15 ) )
-        {
-            std::cout << "Mean Angular Rate error! Expected: " << radiansPerSamplePerSample
-                      << ", Detected: " << rateStats.first << std::endl;
-            retCode = 3;
-        }
-        else if ( rateStats.second > 1.5e-32 )
-        {
-            std::cout << "Phase Noise error! Expected less than: " << 1.5e-32
-                      << ", Detected: " << rateStats.second << std::endl;
-            retCode = 4;
-        }
-        std::cout << "Mean Angular Rate: " << rateStats.first << ", Variance: " << rateStats.second << std::endl;
-#endif
     }
 
     std::pair<double, double> getStats() const { return statsStateMachine.getStats(); }
@@ -141,52 +111,17 @@ private:
 class MagPurityAnalyzer
 {
 public:
-    void analyzeSinusoidMagnitudeStability(const FlyingPhasorElementBufferTypePtr & pBuf, size_t nSamples )
+    void analyzeMagnitudeStability( const FlyingPhasorElementBufferTypePtr & pBuf, size_t nSamples )
     {
         // Reset stats in case an instance is re-run.
         statsStateMachine.reset();
 
         for ( size_t n=0; nSamples != n; ++n )
         {
-            // If the magnitude is far too far off of 1.0. This is an obvious failure.
-            // We are trying to catch the oddball here as a few oddballs may not create much variance.
-            // Variance we check later.
             auto mag = std::abs( pBuf[ n ] );
-#if 0
-            if ( !inTolerance( mag, 1.0, 1e-15 ) )
-            {
-                std::cout << "Magnitude error at sample: " << n << "! Expected: " << 1.0
-                          << ", Detected: " << mag << std::endl;
-                retCode = 1;
-                break;
-            }
-#endif
 
             statsStateMachine.addSample( mag );
         }
-
-#if 0
-        // Now test the statistics look good.
-        auto magStats = statsStateMachine.getStats();
-        if ( !inTolerance( magStats.first, 1.0, 1e-12 ) )
-        {
-            std::cout << "Mean Magnitude error! Expected: " << 1.0
-                      << ", Detected: " << magStats.first << std::endl;
-            retCode = 2;
-        }
-        else if ( magStats.second > 5e-33 )
-        {
-            std::cout << "Magnitude Noise error! Expected less than: " << 5e-33
-                      << ", Detected: " << magStats.second << std::endl;
-            retCode = 3;
-        }
-
-        double signalPower = magStats.first * magStats.first / 2;   // Should always be 0.5
-        std::cout << "Mean Magnitude: " << magStats.first << ", Variance: " << magStats.second
-                  << ", SNR: " << 10.0 * std::log10( signalPower / magStats.second ) << " dB" << std::endl;
-
-        return retCode;
-#endif
     }
 
     std::pair<double, double> getStats() const { return statsStateMachine.getStats(); }
@@ -215,13 +150,78 @@ int main()
     // Phase Purity Test
     PhasePurityAnalyzer phasePurityAnalyzer{};
     phasePurityAnalyzer.analyzePhaseStability( chirpBuf.get(), NUM_SAMPLES, accelRadiansPerSamplePerSample );
-    const auto phaseStats = phasePurityAnalyzer.getStats();
-    const auto phaseMinMax = phasePurityAnalyzer.getMinMaxDev();
-    const auto phasePeakAbsDev = std::max(-phaseMinMax.first, phaseMinMax.second );
-    std::cout << "Mean Phase Error: " << phaseStats.first << ", Variance: " << phaseStats.second << std::endl;
-    std::cout << "Phase Error: maxNegDev: " << phaseMinMax.first << ", maxPosDev: "
-              << phaseMinMax.second << ", maxAbsDev: " << phasePeakAbsDev << std::endl;
+    const auto phaseAccelStats = phasePurityAnalyzer.getStats();
+    const auto phaseAccelMinMax = phasePurityAnalyzer.getMinMaxDev();
+    const auto phaseAccelPeakAbsDev = std::max(-phaseAccelMinMax.first, phaseAccelMinMax.second );
+    std::cout << "Mean Acceleration (radsPerSample^2): " << phaseAccelStats.first << ", Variance: " << phaseAccelStats.second << std::endl;
+    std::cout << "Acceleration Noise: maxNegDev: " << phaseAccelMinMax.first << ", maxPosDev: "
+              << phaseAccelMinMax.second << ", maxAbsDev: " << phaseAccelPeakAbsDev << std::endl;
 
+    MagPurityAnalyzer magPurityAnalyzer{};
+    magPurityAnalyzer.analyzeMagnitudeStability( chirpBuf.get(), NUM_SAMPLES );
+    const auto magStats = magPurityAnalyzer.getStats();
+    const auto magMinMax = magPurityAnalyzer.getMinMaxDev();
+    const auto magPeakAbsDev = std::max(-magMinMax.first, magMinMax.second );
+    std::cout << "Mean Magnitude: " << magStats.first << ", Variance: " << magStats.second
+              << ", SNR: " << 10.0 * std::log10( 0.5 / magStats.second ) << " dB" << std::endl;
+    std::cout << "Magnitude Noise: maxNegDev: " << magMinMax.first << ", maxPosDev: "
+              << magMinMax.second << ", maxAbsDev: " << magPeakAbsDev << std::endl;
 
-    return 0;
+    int retCode = 0;
+    do {
+        std::cout.precision(17);
+        // ***** Chirping Phasor Phase Acceleration Purity - Mean, Variance and Peak Absolute Deviation *****
+        // We are not comparing against legacy here.
+        // We are simply going to verify that the phase acceleration noise is minuscule.
+        if ( !inTolerance( phaseAccelStats.first, accelRadiansPerSamplePerSample, 1e-10 ) )
+        {
+            std::cout << "Chirping Phasor FAILS Mean Angular Acceleration Test! Expected: " << accelRadiansPerSamplePerSample
+                      << ", Detected: " << phaseAccelStats.first << std::endl;
+            retCode = 1;
+            break;
+        }
+        if ( phaseAccelStats.second > 2e-26 )
+        {
+            std::cout << "Chirping Phasor FAILS Angular Acceleration Variance Test! Expected: less than " << 2e-26
+                      << ", Detected: " << phaseAccelStats.second << std::endl;
+            retCode = 2;
+            break;
+        }
+        if ( phaseAccelPeakAbsDev > 4e-13 )
+        {
+            std::cout << "Chirping Phasor FAILS Angular Acceleration Peak Absolute Deviation! Expected less than: " << 4e-13
+                      << ", Detected: " << phaseAccelPeakAbsDev << std::endl;
+            retCode = 3;
+            break;
+        }
+
+        // ***** Flying Phasor Magnitude Purity -  Mean, Variance and Peak Absolute Deviation *****
+        // We are not comparing against the legacy here. Both are very good "mean" wise
+        // and have extremely low variance.
+        // We are simply going to verify that the difference is minuscule.
+        if ( !inTolerance( magStats.first, 1.0, 1e-15 ) )
+        {
+            std::cout << "Chirping Phasor FAILS Mean Magnitude Test! Expected: " << 1.0
+                      << ", Detected: " << magStats.first << std::endl;
+            retCode = 4;
+            break;
+        }
+        if ( magStats.second > 6.0e-33 )
+        {
+            std::cout << "Chirping Phasor FAILS Magnitude Variance Test! Expected: less than " << 6.0e-33
+                      << ", Detected: " << magStats.second << std::endl;
+            retCode = 5;
+            break;
+        }
+        if ( magPeakAbsDev > 3.0e-16 )
+        {
+            std::cout << "Chirping Phasor FAILS Magnitude Peak Absolute Deviation! Expected less than: " << 3.0e-16
+                      << ", Detected: " << magPeakAbsDev << std::endl;
+            retCode = 6;
+            break;
+        }
+
+    } while (false);
+
+    return retCode;
 }

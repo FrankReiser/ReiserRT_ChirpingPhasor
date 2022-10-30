@@ -16,7 +16,7 @@ bool inTolerance( double value, double desiredValue, double toleranceRatio )
 double deltaAngle( double angleA, double angleB )
 {
     auto delta = angleB - angleA;
-    if ( delta > M_PI ) delta -= 2*M_PI;
+    if ( delta >= M_PI ) delta -= 2*M_PI;
     else if ( delta < -M_PI ) delta += 2*M_PI;
     return delta;
 }
