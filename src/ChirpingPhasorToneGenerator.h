@@ -17,10 +17,27 @@ namespace ReiserRT
 {
     namespace Signal
     {
+        /**
+         * @brief Chirping Phasor Tone Generator
+         *
+         * This was developed to replace multiple invocations of cos( n*s ) + j*sin( n*s ),
+         * where omega(s) is a first order function of sample number 's' (e.g. omega = n*s, where n is an
+         * acceleration scalar).
+         *
+         */
         class ReiserRT_ChirpingPhasor_EXPORT ChirpingPhasorToneGenerator
         {
         public:
 
+            /**
+             * @brief Constructor
+             *
+             * Constructs a Chirping Phasor Tone Generator instance.
+             *
+             * @param accelRadiansPerSamplePerSample
+             * @param startingRadiansPerSample
+             * @param startingPhase
+             */
             explicit ChirpingPhasorToneGenerator(
                     double accelRadiansPerSamplePerSample=0.0,
                     double startingRadiansPerSample=0.0,
