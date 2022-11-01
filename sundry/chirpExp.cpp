@@ -6,7 +6,7 @@
 int main()
 {
     // An arbitrary epoch dwell in samples.
-    constexpr size_t NUM_SAMPLES = 2048;
+    constexpr size_t NUM_SAMPLES = 8192;
 
     ReiserRT::Signal::ChirpingPhasorToneGenerator chirpGen{ M_PI / NUM_SAMPLES };
 
@@ -21,9 +21,10 @@ int main()
 //    std::cout << std::scientific;
     std::cout.precision(6);
     auto p = chirpBuf.get();
-    for ( size_t n = 0; NUM_SAMPLES != n; ++n, ++p )
+    for ( size_t n = 0; 10 != n; ++n, ++p )
     {
-        std::cout << p->real() << " " << p->imag() << std::endl;
+//        std::cout << p->real() << " " << p->imag() << std::endl;
+        std::cout << "Sample: " << n << ", theta = " << std::arg( *p ) << std::endl;
     }
 
     return 0;

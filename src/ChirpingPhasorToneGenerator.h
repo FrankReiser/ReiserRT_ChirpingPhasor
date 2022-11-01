@@ -5,7 +5,6 @@
  * @date Initiated October 27th, 2022
  */
 
-
 #ifndef REISER_RT_CHIRPINGPHASORTONEGENERATOR_H
 #define REISER_RT_CHIRPINGPHASORTONEGENERATOR_H
 
@@ -17,14 +16,28 @@ namespace ReiserRT
 {
     namespace Signal
     {
+        /**
+         * @brief Chirping Phasor Tone Generator
+         *
+         * This was developed to replace multiple invocations of cos( f(s) + phi ) + j*sin( f(s) + phi ),
+         * where f(s) is a second order function of sample number 's' (e.g. f(s) = omega0*s + 0.5*accel*s^2).
+         * It provides the classic 'chirp' of a linearly increasing frequency starting from omega0, and
+         * accelerating (or decelerating) from there with a constant acceleration.
+         */
         class ReiserRT_ChirpingPhasor_EXPORT ChirpingPhasorToneGenerator
         {
         public:
 
-            explicit ChirpingPhasorToneGenerator(
-                    double accelRadiansPerSamplePerSample=0.0,
-                    double startingRadiansPerSample=0.0,
-                    double startingPhase=0.0 );
+            /**
+             * @brief Constructor
+             *
+             * Constructs a Chirping Phasor Tone Generator instance.
+             *
+             * @param accel Acceleration in radians per sample, per sample.
+             * @param omegaZero Starting angular velocity in radians per sample.
+             * @param phi Starting phase angle in radians.
+             */
+            explicit ChirpingPhasorToneGenerator( double accel=0.0, double omegaZero=0.0, double phi=0.0 );
 
             /**
              * @brief Get Samples Operation
@@ -37,10 +50,18 @@ namespace ReiserRT
              */
             void getSamples( FlyingPhasorElementBufferTypePtr pElementBuffer, size_t numSamples );
 
-            void reset(
-                    double accelRadiansPerSamplePerSample=0.0,
-                    double startingRadiansPerSample=0.0,
-                    double startingPhase=0.0 );
+            /**
+             * @brief Reset Operation
+             *
+             * This operation resets the chirping phasor as if it were just constructed with the parameters.
+             * This allows reuse of an existing instance for a differing run including
+             * setting the sample counter to zero.
+             *
+             * @param accel Acceleration in radians per sample, per sample.
+             * @param omegaZero Starting angular velocity in radians per sample.
+             * @param phi Starting phase angle in radians.
+             */
+            void reset( double accel=0.0, double omegaZero=0.0, double phi=0.0 );
 
             /**
              * @brief Get Sample Counter
@@ -51,10 +72,14 @@ namespace ReiserRT
              */
             inline size_t getSampleCount() { return sampleCounter; }
 
+            ///@todo Implement a setAccel function that can be called at any time between `getSamples`
+            ///operations to provide a new acceleration profile or to cancel any previous acceleration.
+            ///Can this be done? I believe it can but would need to be verified.
+
         private:
-            FlyingPhasorToneGenerator rate;
-            FlyingPhasorElementType phasor;
-            size_t sampleCounter;
+            FlyingPhasorToneGenerator rate;     //!< Dynamic angular rate provider is a FlyingPhasorToneGenerator
+            FlyingPhasorElementType phasor;     //!< Current phase angle
+            size_t sampleCounter;               //!< Tracks sample count.
         };
     }
 }

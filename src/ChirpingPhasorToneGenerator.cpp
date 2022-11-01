@@ -9,18 +9,17 @@
 
 using namespace ReiserRT::Signal;
 
-ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator(
-        double accelRadiansPerSamplePerSample, double startingRadiansPerSample, double startingPhase )
-  : rate{ accelRadiansPerSamplePerSample, accelRadiansPerSamplePerSample }
-  , phasor{ FlyingPhasorElementType{1.0, 0.0 } * std::polar(1.0, startingPhase ) }
+ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator( double accel, double startingRadiansPerSample, double phi )
+  : rate{ accel, startingRadiansPerSample + accel / 2.0 }
+  , phasor{ FlyingPhasorElementType{1.0, 0.0 } * std::polar(1.0, phi ) }
   , sampleCounter{}
 {
 }
 
-void ChirpingPhasorToneGenerator::reset(  double accelRadiansPerSamplePerSample, double startingRadiansPerSample, double startingPhase )
+void ChirpingPhasorToneGenerator::reset( double accel, double omegaZero, double phi )
 {
-    rate = FlyingPhasorToneGenerator{ accelRadiansPerSamplePerSample, accelRadiansPerSamplePerSample };
-    phasor = FlyingPhasorElementType{ 1.0, 0.0 } * std::polar( 1.0, startingPhase );
+    rate = FlyingPhasorToneGenerator{ accel, omegaZero + accel / 2.0 };
+    phasor = FlyingPhasorElementType{ 1.0, 0.0 } * std::polar(1.0, phi );
     sampleCounter = 0;
 }
 
@@ -37,8 +36,7 @@ void ChirpingPhasorToneGenerator::getSamples( FlyingPhasorElementBufferTypePtr p
 
         // Perform normalization
         // Super-fast modulo 2 (for 4, 8, 16..., use 0x3, 0x7, 0xF...)
-        ///@todo Considering "== 0x0" so it's alternating with the "rate" FlyingPhasor normalization cycle.
-        if ( ( sampleCounter++ & 0x1 ) == 0x0 )
+        if ( ( sampleCounter++ & 0x1 ) == 0x1 )
         {
             // Normally, this would require a sqrt invocation. However, when the sum of squares
             // is near a value of 1, the square root would also be near 1.
