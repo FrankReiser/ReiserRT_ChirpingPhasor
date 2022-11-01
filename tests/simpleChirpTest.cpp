@@ -85,6 +85,7 @@ public:
             // a delta.
             if ( 0 == n )
             {
+                // Add sample for n = 0 based on expected acceleration value.
                 statsStateMachine.addSample( radiansPerSamplePerSample );
             }
             else
@@ -92,11 +93,21 @@ public:
                 const auto testSamplePhase = std::arg( pBuf[ n ] );
                 const auto prevTestSamplePhase = std::arg(pBuf[ n-1 ] );
 
+                // Calculate omega mean (omegaBar) over the course of 1 sample.
+                // This is simple the delta angle, in radians per sample.
                 const auto omegaBar = deltaAngle(prevTestSamplePhase, testSamplePhase );
+
+                // Calculate omega(n) for this sample based knowledge of previous omega and
+                // equation,  omegaBar = ( omega(n) + omega(n-1) ) / 2, solved for omega(n).
                 const auto omega = 2 * omegaBar - prevOmega;
+
+                // Acceleration is the value of omega(n) divided by n.
                 const auto accel = omega / double( n );
+
+                // Track previous omega for next iteration.
                 prevOmega = omega;
 
+                // Add sample to statistics state machine.
                 statsStateMachine.addSample( accel );
             }
         }
