@@ -6,7 +6,7 @@
 int main()
 {
     // An arbitrary epoch dwell in samples.
-    constexpr size_t NUM_SAMPLES = 2048;
+    constexpr size_t NUM_SAMPLES = 8192;
 
     ReiserRT::Signal::ChirpingPhasorToneGenerator chirpGen{ M_PI / NUM_SAMPLES };
 
