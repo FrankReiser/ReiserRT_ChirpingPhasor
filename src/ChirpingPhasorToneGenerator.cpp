@@ -9,8 +9,8 @@
 
 using namespace ReiserRT::Signal;
 
-ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator( double accel, double startingRadiansPerSample, double phi )
-  : rate{ accel, startingRadiansPerSample + accel / 2.0 }
+ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator( double accel, double omegaZero, double phi )
+  : rate{accel, omegaZero + accel / 2.0 }
   , phasor{ FlyingPhasorElementType{1.0, 0.0 } * std::polar(1.0, phi ) }
   , sampleCounter{}
 {
