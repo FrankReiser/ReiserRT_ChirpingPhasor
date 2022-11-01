@@ -64,25 +64,3 @@ int CommandLineParser::parseCommandLine( int argc, char * argv[] )
 
     return retCode;
 }
-
-#if 0
-int main( int argc, char * argv[] ) {
-
-    std::cout << "Hello, World!" << " The value of argc is " << argc << std::endl;
-
-    if (1 < argc)
-    {
-        if ( 0 != parseCommandLine(argc, argv) )
-        {
-            std::cout << "Failed parsing command line" << std::endl;
-            return -1;
-        }
-    }
-    else
-    {
-        std::cout << "No program arguments, entering interactive mode" << std::endl;
-    }
-
-    return 0;
-}
-#endif
