@@ -9,18 +9,18 @@
 
 using namespace ReiserRT::Signal;
 
-///@todo Neglecting starting radians per sample for constructor and in reset call.
 ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator(
         double accelRadiansPerSamplePerSample, double startingRadiansPerSample, double startingPhase )
-  : rate{ accelRadiansPerSamplePerSample, accelRadiansPerSamplePerSample / 2.0 }
+  : rate{ accelRadiansPerSamplePerSample, startingRadiansPerSample + accelRadiansPerSamplePerSample / 2.0 }
   , phasor{ FlyingPhasorElementType{1.0, 0.0 } * std::polar(1.0, startingPhase ) }
   , sampleCounter{}
 {
 }
 
-void ChirpingPhasorToneGenerator::reset(  double accelRadiansPerSamplePerSample, double startingRadiansPerSample, double startingPhase )
+void ChirpingPhasorToneGenerator::reset( double accelRadiansPerSamplePerSample, double startingRadiansPerSample, double startingPhase )
 {
-    rate = FlyingPhasorToneGenerator{ accelRadiansPerSamplePerSample, accelRadiansPerSamplePerSample / 2.0 };
+    rate = FlyingPhasorToneGenerator{ accelRadiansPerSamplePerSample,
+                                      startingRadiansPerSample + accelRadiansPerSamplePerSample / 2.0 };
     phasor = FlyingPhasorElementType{ 1.0, 0.0 } * std::polar( 1.0, startingPhase );
     sampleCounter = 0;
 }

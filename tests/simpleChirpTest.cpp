@@ -54,8 +54,8 @@ public:
     {
         mean = 0.0;
         M2 = 0.0;
-        maxNegDev = std::numeric_limits< double >::max();
-        maxPosDev = std::numeric_limits< double >::lowest();
+        maxNegDev = std::numeric_limits< long double >::max();
+        maxPosDev = std::numeric_limits< long double >::lowest();
         nSamples = 0;
     }
 
@@ -97,11 +97,12 @@ public:
                 // This is simple the delta angle, in radians per sample.
                 const auto omegaBar = deltaAngle(prevTestSamplePhase, testSamplePhase );
 
-                // Calculate omega(n) for this sample based knowledge of previous omega and
-                // equation,  omegaBar = ( omega(n) + omega(n-1) ) / 2, solved for omega(n).
+                // Calculate omega(n) for this sample based on knowledge of previous omega and
+                // equation, omegaBar = ( omega(n) + omega(n-1) ) / 2, solved for omega(n).
                 const auto omega = 2 * omegaBar - prevOmega;
 
-                // Acceleration is the value of omega(n) divided by n.
+                // Acceleration is the value of omega(n) divided by n from equation
+                // omega(n) = accel * n, solved for acceleration.
                 const auto accel = omega / double( n );
 
                 // Track previous omega for next iteration.
