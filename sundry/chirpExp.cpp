@@ -21,9 +21,10 @@ int main()
 //    std::cout << std::scientific;
     std::cout.precision(6);
     auto p = chirpBuf.get();
-    for ( size_t n = 0; NUM_SAMPLES != n; ++n, ++p )
+    for ( size_t n = 0; 10 != n; ++n, ++p )
     {
-        std::cout << p->real() << " " << p->imag() << std::endl;
+//        std::cout << p->real() << " " << p->imag() << std::endl;
+        std::cout << "Sample: " << n << ", theta = " << std::arg( *p ) << std::endl;
     }
 
     return 0;
