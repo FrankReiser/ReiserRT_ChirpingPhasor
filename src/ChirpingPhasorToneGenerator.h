@@ -20,9 +20,9 @@ namespace ReiserRT
          * @brief Chirping Phasor Tone Generator
          *
          * This was developed to replace multiple invocations of cos( f(s) + phi ) + j*sin( f(s) + phi ),
-         * where f(s) is a second order function of sample number 's' (e.g. f(s) = omega0*s + 0.5*accel*s^2).
+         * where f(s) is a second order function of sample number 's' in the form f(s) = omega0*s + 0.5*accel*s^2).
          * It provides the classic 'chirp' of a linearly increasing frequency starting from omega0, and
-         * accelerating (or decelerating) from there with a constant acceleration.
+         * accelerating (or decelerating) from omega0 at a constant rate.
          */
         class ReiserRT_ChirpingPhasor_EXPORT ChirpingPhasorToneGenerator
         {
