@@ -77,10 +77,7 @@ public:
         // Reset stats in case an instance is re-run.
         statsStateMachine.reset();
 
-//        // The tracking radian per sample rate gets initialized to radians per sample, per sample (negated).
-//        // It gets to zero on the after first iteration and used second iteration onward.
-        auto prevOmega = 0;
-//        for ( size_t n=0; nSamples != n; ++n, trackingRadiansPerSample += radiansPerSamplePerSample )
+        double prevOmega = 0.0;
         for ( size_t n=0; nSamples != n; ++n )
         {
 
@@ -92,15 +89,6 @@ public:
             }
             else
             {
-#if 0
-                const auto omega = prevOmega + radiansPerSamplePerSample;
-
-                const auto testSamplePhase = std::arg( pBuf[ n ] );
-                const auto prevTestSamplePhase = std::arg(pBuf[ n-1 ] );
-                const auto dTheta = deltaAngle(prevTestSamplePhase, testSamplePhase );
-                const auto accel = 2 * dTheta / double( n * n );
-                std::cout << "accel: " << accel << std::endl;
-#else
                 const auto testSamplePhase = std::arg( pBuf[ n ] );
                 const auto prevTestSamplePhase = std::arg(pBuf[ n-1 ] );
 
@@ -109,10 +97,7 @@ public:
                 const auto accel = omega / double( n );
                 prevOmega = omega;
 
-                std::cout << "accel: " << accel << std::endl;
-//                const auto accel =  radiansPerSample - trackingRadiansPerSample;
-//                statsStateMachine.addSample( accel );
-#endif
+                statsStateMachine.addSample( accel );
             }
         }
     }
