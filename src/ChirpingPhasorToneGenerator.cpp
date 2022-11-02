@@ -1,6 +1,6 @@
 /**
  * @file ChirpingPhasorToneGenerator.h
- * @brief The implementation file for the Chirp Phasor Tone Generator.
+ * @brief The implementation file for the Chirping Phasor Tone Generator.
  * @authors Frank Reiser
  * @date Initiated October 27th, 2022
  */
@@ -10,7 +10,7 @@
 using namespace ReiserRT::Signal;
 
 ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator( double accel, double omegaZero, double phi )
-  : rate{accel, omegaZero + accel / 2.0 }
+  : rate{ accel, initialDeltaTheta( omegaZero, accel ) }
   , phasor{ FlyingPhasorElementType{1.0, 0.0 } * std::polar(1.0, phi ) }
   , sampleCounter{}
 {
@@ -18,7 +18,7 @@ ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator( double accel, double o
 
 void ChirpingPhasorToneGenerator::reset( double accel, double omegaZero, double phi )
 {
-    rate = FlyingPhasorToneGenerator{ accel, omegaZero + accel / 2.0 };
+    rate.reset( accel, initialDeltaTheta( omegaZero, accel ) );
     phasor = FlyingPhasorElementType{ 1.0, 0.0 } * std::polar(1.0, phi );
     sampleCounter = 0;
 }

@@ -1,6 +1,6 @@
 /**
  * @file ChirpingPhasorToneGenerator.h
- * @brief The specification file for the Chirp Phasor Tone Generator.
+ * @brief The specification file for the Chirping Phasor Tone Generator.
  * @authors Frank Reiser
  * @date Initiated October 27th, 2022
  */
@@ -19,10 +19,14 @@ namespace ReiserRT
         /**
          * @brief Chirping Phasor Tone Generator
          *
-         * This was developed to replace multiple invocations of cos( f(s) + phi ) + j*sin( f(s) + phi ),
-         * where f(s) is a second order function of sample number 's' in the form f(s) = omega0*s + 0.5*accel*s^2).
+         * This was developed to replace multiple invocations of, cos( f(s) + phi ) + j*sin( f(s) + phi ),
+         * where f(s) is a second order function of sample number in the form f(s) = omega0 * s + 0.5 * accel * s^2.
          * It provides the classic 'chirp' of a linearly increasing frequency starting from omega0, and
-         * accelerating (or decelerating) from omega0 at a constant rate.
+         * accelerating (or decelerating) from omega0 at a constant acceleration. It makes usage of an internal
+         * ReiserRT FlyingPhasorToneGenerator instance to provide a dynamic rate. Otherwise, it's implementation
+         * looks almost identical to that of ReiserRT FlyingPhasorToneGenerator which has a fixed rate.s
+         *
+         * Please see documentation for ReiserRT FlyingPhasorToneGenerator for more information.
          */
         class ReiserRT_ChirpingPhasor_EXPORT ChirpingPhasorToneGenerator
         {
@@ -77,9 +81,37 @@ namespace ReiserRT
             ///Can this be done? I believe it can but would need to be verified.
 
         private:
-            FlyingPhasorToneGenerator rate;     //!< Dynamic angular rate provider is a FlyingPhasorToneGenerator
+            /**
+             * @brief Obtain Initial Delta Theta Value
+             *
+             * This operation is utilized during construction and during reset operations. It's purpose
+             * is to provide a value for the initial angular displacement (delta theta) between the first sample and the
+             * second sample. This value is required for our initializing, or resetting our 'rate' attribute's phase.
+             *
+             * From rotational kinematics angular displacement, we have formula:
+             *
+             * ... deltaTheta = omegaZero * t + 0.5 * accel * t^2 ...
+             *
+             * For the first sample where 't' equals zero, we have no angular displacement. The second sample where
+             * 't' equals one, we have our initial angular displacement. Substituting 1 into the above formula
+             * yields:
+             *
+             * ... deltaTheta = omegaZero + 0.5 * accel ...
+             *
+             * @param omegaZero Starting angular velocity in radians per sample.
+             * @param accel Acceleration in radians per sample, per sample.
+             *
+             * @return Returns the initial angular displacement between the first and second sample (indices 0 and 1).
+             */
+            static inline double initialDeltaTheta( double omegaZero, double accel )
+            {
+                return omegaZero + 0.5 * accel;
+            }
+
+        private:
+            FlyingPhasorToneGenerator rate;     //!< Dynamic angular rate provider
             FlyingPhasorElementType phasor;     //!< Current phase angle
-            size_t sampleCounter;               //!< Tracks sample count.
+            size_t sampleCounter;               //!< Tracks sample count used or renormalization purposes.
         };
     }
 }
