@@ -11,7 +11,7 @@ using namespace ReiserRT::Signal;
 
 ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator( double accel, double omegaZero, double phi )
   : rate{ accel, initialDeltaTheta( omegaZero, accel ) }
-  , phasor{ FlyingPhasorElementType{1.0, 0.0 } * std::polar(1.0, phi ) }
+  , phasor{ std::polar(1.0, phi ) }
   , sampleCounter{}
 {
 }
@@ -19,7 +19,7 @@ ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator( double accel, double o
 void ChirpingPhasorToneGenerator::reset( double accel, double omegaZero, double phi )
 {
     rate.reset( accel, initialDeltaTheta( omegaZero, accel ) );
-    phasor = FlyingPhasorElementType{ 1.0, 0.0 } * std::polar(1.0, phi );
+    phasor = std::polar(1.0, phi );
     sampleCounter = 0;
 }
 
