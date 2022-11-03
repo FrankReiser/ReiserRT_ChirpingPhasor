@@ -12,7 +12,7 @@ using namespace ReiserRT::Signal;
 ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator( double accel, double omegaZero, double phi )
   : rate{ accel, initialDeltaTheta( omegaZero, accel ) }
   , phasor{ FlyingPhasorElementType{1.0, 0.0 } * std::polar(1.0, phi ) }
-  , omegaN{ omegaZero }
+//  , omegaN{ omegaZero }
   , sampleCounter{}
 {
 }
@@ -21,7 +21,7 @@ void ChirpingPhasorToneGenerator::reset( double accel, double omegaZero, double 
 {
     rate.reset( accel, initialDeltaTheta( omegaZero, accel ) );
     phasor = FlyingPhasorElementType{ 1.0, 0.0 } * std::polar(1.0, phi );
-    omegaN = omegaZero;
+//    omegaN = omegaZero;
     sampleCounter = 0;
 }
 
@@ -36,7 +36,7 @@ void ChirpingPhasorToneGenerator::getSamples( FlyingPhasorElementBufferTypePtr p
         // Now advance (rotate) the phasor by our "dynamic" rate (complex multiply).
         // We cache a copy of this rate as omegaN. This may be needed for a modAccel invocation
         // or client query.
-        phasor *= omegaN = rate.getSample();
+        phasor *= rate.getSample();
 
         // Perform normalization
         // Super-fast modulo 2 (for 4, 8, 16..., use 0x3, 0x7, 0xF...)

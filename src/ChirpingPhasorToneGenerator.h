@@ -87,7 +87,7 @@ namespace ReiserRT
              * @return Returns the current value of omega (angular velocity) of the tone generator for the last
              * sample delivered.
              */
-            inline FlyingPhasorPrecisionType getOmegaN() const { return std::arg( omegaN ); }
+            inline FlyingPhasorPrecisionType getOmegaN() const { return 0.0; }
 
             /**
              * @brief Modify Acceleration
@@ -131,7 +131,6 @@ namespace ReiserRT
         private:
             FlyingPhasorToneGenerator rate;     //!< Dynamic angular rate provider
             FlyingPhasorElementType phasor;     //!< Current phase angle
-            FlyingPhasorElementType omegaN;     //!< Angular velocity of last sample delivered or omegaZero if never advanced.
             size_t sampleCounter;               //!< Tracks sample count used or renormalization purposes.
         };
     }
