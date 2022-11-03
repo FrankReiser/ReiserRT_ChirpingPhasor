@@ -12,6 +12,7 @@ using namespace ReiserRT::Signal;
 ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator( double accel, double omegaZero, double phi )
   : rate{ accel, initialDeltaTheta( omegaZero, accel ) }
   , phasor{ FlyingPhasorElementType{1.0, 0.0 } * std::polar(1.0, phi ) }
+  , omegaN{ omegaZero }
   , sampleCounter{}
 {
 }
@@ -20,6 +21,7 @@ void ChirpingPhasorToneGenerator::reset( double accel, double omegaZero, double 
 {
     rate.reset( accel, initialDeltaTheta( omegaZero, accel ) );
     phasor = FlyingPhasorElementType{ 1.0, 0.0 } * std::polar(1.0, phi );
+    omegaN = omegaZero;
     sampleCounter = 0;
 }
 
@@ -31,8 +33,10 @@ void ChirpingPhasorToneGenerator::getSamples( FlyingPhasorElementBufferTypePtr p
         // and advance (rotate) afterwards.
         *pElementBuffer++ = phasor;
 
-        // Now advance (rotate) the phasor by our "dynamic" rate (complex multiply)
-        phasor *= rate.getSample();
+        // Now advance (rotate) the phasor by our "dynamic" rate (complex multiply).
+        // We cache a copy of this rate as omegaN. This may be needed for a modAccel invocation
+        // or client query.
+        phasor *= omegaN = rate.getSample();
 
         // Perform normalization
         // Super-fast modulo 2 (for 4, 8, 16..., use 0x3, 0x7, 0xF...)
@@ -46,4 +50,9 @@ void ChirpingPhasorToneGenerator::getSamples( FlyingPhasorElementBufferTypePtr p
             phasor *= d;
         }
     }
+}
+
+void ChirpingPhasorToneGenerator::modifyAccel( double newAccel )
+{
+    rate.reset( newAccel, initialDeltaTheta( getOmegaN(), newAccel ) );
 }

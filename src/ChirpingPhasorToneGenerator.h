@@ -74,11 +74,31 @@ namespace ReiserRT
              *
              * @return Returns the current value of the sample counter.
              */
-            inline size_t getSampleCount() { return sampleCounter; }
+            inline size_t getSampleCount() const { return sampleCounter; }
 
-            ///@todo Implement a setAccel function that can be called at any time between `getSamples`
-            ///operations to provide a new acceleration profile or to cancel any previous acceleration.
-            ///Can this be done? I believe it can but would need to be verified.
+            /**
+             * @brief Obtain Current Omega Value (Angular Velocity)
+             *
+             * This operation returns the current value of omegaN, the last angular velocity value.
+             * This value should not be allowed to exceed +/-pi radians per sample. If it is expected
+             * that, in long running scenarios that this might occur. This operation can be used to
+             * monitor it and utilize the modifyAccel operation to halt or modify the acceleration profile.
+             *
+             * @return Returns the current value of omega (angular velocity) of the tone generator for the last
+             * sample delivered.
+             */
+            inline FlyingPhasorPrecisionType getOmegaN() const { return std::arg( omegaN ); }
+
+            /**
+             * @brief Modify Acceleration
+             *
+             * This operation modifies the current acceleration profile. This may be useful in long
+             * running scenarios where they nyquist point would be reached. The getOmegaN operation
+             * may be used to monitor the angular velocity.
+             *
+             * @param newAccel New cceleration in radians per sample, per sample. Defaults to zero.
+             */
+            void modifyAccel( double newAccel=0 );
 
         private:
             /**
@@ -111,6 +131,7 @@ namespace ReiserRT
         private:
             FlyingPhasorToneGenerator rate;     //!< Dynamic angular rate provider
             FlyingPhasorElementType phasor;     //!< Current phase angle
+            FlyingPhasorElementType omegaN;     //!< Angular velocity of last sample delivered or omegaZero if never advanced.
             size_t sampleCounter;               //!< Tracks sample count used or renormalization purposes.
         };
     }
