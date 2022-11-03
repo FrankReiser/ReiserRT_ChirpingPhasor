@@ -149,7 +149,7 @@ int main()
     // An arbitrary epoch dwell in samples.
     constexpr size_t NUM_SAMPLES = 8192;
 
-    const auto accelRadiansPerSamplePerSample = M_PI / NUM_SAMPLES;
+    constexpr auto accelRadiansPerSamplePerSample = M_PI / NUM_SAMPLES;
 
     ReiserRT::Signal::ChirpingPhasorToneGenerator chirpGen{ accelRadiansPerSamplePerSample };
 
