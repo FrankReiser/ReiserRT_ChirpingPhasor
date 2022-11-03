@@ -24,7 +24,7 @@ namespace ReiserRT
          * It provides the classic 'chirp' of a linearly increasing frequency starting from omega0, and
          * accelerating (or decelerating) from omega0 at a constant acceleration. It makes usage of an internal
          * ReiserRT FlyingPhasorToneGenerator instance to provide a dynamic rate. Otherwise, it's implementation
-         * looks almost identical to that of ReiserRT FlyingPhasorToneGenerator which has a fixed rate.s
+         * looks almost identical to that of ReiserRT FlyingPhasorToneGenerator which has a fixed rate.
          *
          * Please see documentation for ReiserRT FlyingPhasorToneGenerator for more information.
          */
