@@ -1,6 +1,5 @@
 #include "ChirpingPhasorToneGenerator.h"
 
-#include <memory>
 #include <iostream>
 
 int main()
@@ -10,21 +9,19 @@ int main()
 
     ReiserRT::Signal::ChirpingPhasorToneGenerator chirpGen{ M_PI / NUM_SAMPLES };
 
-    // Buffers for an epoch's worth of data for the chirp.
-    using SampleType = ReiserRT::Signal::FlyingPhasorElementType;
-    std::unique_ptr< SampleType[] > chirpBuf{ new SampleType[ NUM_SAMPLES ] };
-
-    // Get data from each of the tone generators.
-    chirpGen.getSamples( chirpBuf.get(), NUM_SAMPLES );
 
     // Write to standard out. It can be redirected.
 //    std::cout << std::scientific;
     std::cout.precision(6);
-    auto p = chirpBuf.get();
-    for ( size_t n = 0; 10 != n; ++n, ++p )
+    for ( size_t n = 0; 10 != n; ++n  )
     {
-//        std::cout << p->real() << " " << p->imag() << std::endl;
-        std::cout << "Sample: " << n << ", theta = " << std::arg( *p ) << std::endl;
+        auto omegaN = chirpGen.getOmegaN();
+        auto sample = chirpGen.getSample();
+        std::cout
+                << "Sample: " << n
+                << ", theta = " << std::arg( sample )
+                << ", omegaN = " << omegaN
+                << std::endl;
     }
 
     return 0;

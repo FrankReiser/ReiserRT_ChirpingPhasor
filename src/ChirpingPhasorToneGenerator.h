@@ -54,6 +54,8 @@ namespace ReiserRT
              */
             void getSamples( FlyingPhasorElementBufferTypePtr pElementBuffer, size_t numSamples );
 
+            FlyingPhasorElementType getSample();
+
             /**
              * @brief Reset Operation
              *
@@ -77,17 +79,21 @@ namespace ReiserRT
             inline size_t getSampleCount() const { return sampleCounter; }
 
             /**
-             * @brief Obtain Current Omega Value (Angular Velocity)
+             * @brief Obtain Next Omega Value (Angular Velocity)
              *
-             * This operation returns the current value of omegaN, the last angular velocity value.
-             * This value should not be allowed to exceed +/-pi radians per sample. If it is expected
-             * that, in long running scenarios that this might occur. This operation can be used to
-             * monitor it and utilize the modifyAccel operation to halt or modify the acceleration profile.
+             * This operation returns the next value of omega, the angular velocity value that will be delivered.
+             * If this value is allowed to exceed +/-pi radians per sample (nyquist rate), output will 'roll'.
+             * Positive frequency becomes negative, and negative frequency becomes positive.
+             * If it is expected that, in long running scenarios, that this might occur.
+             * This operation can be used to monitor angular velocity and, through
+             * the modifyAccel operation, acceleration may be halted or modified.
              *
-             * @return Returns the current value of omega (angular velocity) of the tone generator for the last
-             * sample delivered.
+             * @return Returns the next value of omega (angular velocity) of the tone generator to be delivered.
              */
-            inline FlyingPhasorPrecisionType getOmegaN() const { return 0.0; }
+            inline FlyingPhasorPrecisionType getOmegaN() const {
+                auto & omegaBarNext = rate.peakNextSample();
+                return std::arg( omegaBarNext ) - accelOver2;
+            }
 
             /**
              * @brief Modify Acceleration
@@ -102,36 +108,36 @@ namespace ReiserRT
 
         private:
             /**
-             * @brief Obtain Initial Delta Theta Value
+             * @brief The Normalize Operation.
              *
-             * This operation is utilized during construction and during reset operations. It's purpose
-             * is to provide a value for the initial angular displacement (delta theta) between the first sample and the
-             * second sample. This value is required for our initializing, or resetting our 'rate' attribute's phase.
-             *
-             * From rotational kinematics angular displacement, we have formula:
-             *
-             * ... deltaTheta = omegaZero * t + 0.5 * accel * t^2 ...
-             *
-             * For the first sample where 't' equals zero, we have no angular displacement. The second sample where
-             * 't' equals one, we have our initial angular displacement. Substituting 1 into the above formula
-             * yields:
-             *
-             * ... deltaTheta = omegaZero + 0.5 * accel ...
-             *
-             * @param omegaZero Starting angular velocity in radians per sample.
-             * @param accel Acceleration in radians per sample, per sample.
-             *
-             * @return Returns the initial angular displacement between the first and second sample (indices 0 and 1).
+             * Normalize every N iterations to ensure we maintain a unit vector
+             * as rounding errors accumulate. Doing this too often reduces computational performance
+             * and not doing it often enough increases noise (phase and amplitude).
+             * We are being pretty aggressive as it is at every 2 iterations.
+             * By normalizing every two iterations, we push any slight adjustments to the nyquist rate.
+             * This means that any spectral spurs created are at the nyquist and hopefully of less
+             * consequence. Declared inline here for efficient reuse within the implementation.
              */
-            static inline double initialDeltaTheta( double omegaZero, double accel )
+            inline void normalize( )
             {
-                return omegaZero + 0.5 * accel;
+                // Super-fast modulo 2 (for 4, 8, 16..., use 0x3, 0x7, 0xF...)
+                if ( ( sampleCounter++ & 0x1 ) == 0x1 )
+                {
+                    // Normally, this would require a sqrt invocation. However, when the sum of squares
+                    // is near a value of 1, the square root would also be near 1.
+                    // This is a first order Taylor Series approximation around 1 for the sqrt function.
+                    // The re-normalization adjustment is a scalar multiply (not complex multiply).
+                    const double d = 1.0 - ( phasor.real()*phasor.real() + phasor.imag()*phasor.imag() - 1.0 ) / 2.0;
+                    phasor *= d;
+                }
             }
 
+
         private:
-            FlyingPhasorToneGenerator rate;     //!< Dynamic angular rate provider
-            FlyingPhasorElementType phasor;     //!< Current phase angle
-            size_t sampleCounter;               //!< Tracks sample count used or renormalization purposes.
+            FlyingPhasorPrecisionType accelOver2;   //!< A useful internal quantity.
+            FlyingPhasorToneGenerator rate;         //!< Dynamic angular rate provider
+            FlyingPhasorElementType phasor;         //!< Current phase angle
+            size_t sampleCounter;                   //!< Tracks sample count used or renormalization purposes.
         };
     }
 }

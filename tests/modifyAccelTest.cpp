@@ -32,10 +32,10 @@ int main()
 
         // Get the phase of the last sample and query the angular velocity
         auto endPhase = std::arg( chirpBuf[NUM_SAMPLES-1] );
-        auto omegaN = chirpGen.getOmegaN();
+//        auto omegaN = chirpGen.getOmegaN();
 
-        if ( expectedOmegaN != omegaN )
-            std::cout << "BLAH" << std::endl;
+//        if ( expectedOmegaN != omegaN )
+//            std::cout << "BLAH" << std::endl;
 
 
     } while (false);
