@@ -81,14 +81,16 @@ namespace ReiserRT
             /**
              * @brief Obtain Next Omega Value (Angular Velocity)
              *
-             * This operation returns the next value of omega, the angular velocity value that will be delivered.
-             * If this value is allowed to exceed +/-pi radians per sample (nyquist rate), output will 'roll'.
-             * Positive frequency becomes negative, and negative frequency becomes positive.
-             * If it is expected that, in long running scenarios, that this might occur.
-             * This operation can be used to monitor angular velocity and, through
-             * the modifyAccel operation, acceleration may be halted or modified.
+             * This operation returns the value of omega (angular velocity), representative of the next sample delivered.
+             * If invoked after construction or a reset, this should should be very close to argument omegaZero,
+             * within double precision accuracy constraints.
+             * If this value is allowed to exceed +/-pi radians per sample (nyquist rate), output will 'rollover'.
+             * In essence, positive frequency becomes negative, and negative frequency becomes positive.
+             * If it is expected in long running scenarios, that this might occur,
+             * this operation may be used to monitor angular velocity. Then acceleration may be halted or modified
+             * to prevent 'rollover' by using the modifyAccel operation.
              *
-             * @return Returns the next value of omega (angular velocity) of the tone generator to be delivered.
+             * @return Returns the next value of omega (angular velocity) representative of the next sample to be delivered.
              */
             inline FlyingPhasorPrecisionType getOmegaN() const {
                 auto & omegaBarNext = rate.peakNextSample();
@@ -98,11 +100,16 @@ namespace ReiserRT
             /**
              * @brief Modify Acceleration
              *
-             * This operation modifies the current acceleration profile. This may be useful in long
-             * running scenarios where they nyquist point would be reached. The getOmegaN operation
-             * may be used to monitor the angular velocity.
+             * This operation modifies the acceleration value. This may be useful in long
+             * running scenarios where they nyquist point would be reached. Invoking this operation will
+             * not modify the angular velocity of the next sample. This next sample value is already 'baked'
+             * into the pipeline. It modifies what happens after the next sample delivered.
              *
-             * @param newAccel New cceleration in radians per sample, per sample. Defaults to zero.
+             * @note The getOmegaN operation may be used to monitor the angular velocity for the next sample to be
+             * delivered.
+             *
+             * @param newAccel New acceleration value in radians per sample, per sample. Defaults to zero which
+             * halts all acceleration and maintains the last omegaN value from there on out.
              */
             void modifyAccel( double newAccel=0 );
 
@@ -132,10 +139,9 @@ namespace ReiserRT
                 }
             }
 
-
         private:
             FlyingPhasorPrecisionType accelOver2;   //!< A useful internal quantity.
-            FlyingPhasorToneGenerator rate;         //!< Dynamic angular rate provider
+            FlyingPhasorToneGenerator rate;         //!< Dynamic angular rate provider (sample to sample, omegaBar)
             FlyingPhasorElementType phasor;         //!< Current phase angle
             size_t sampleCounter;                   //!< Tracks sample count used or renormalization purposes.
         };

@@ -62,6 +62,6 @@ FlyingPhasorElementType ChirpingPhasorToneGenerator::getSample()
 
 void ChirpingPhasorToneGenerator::modifyAccel( double newAccel )
 {
-    ///@todo This still needs validation.
-//    rate.reset( newAccel, initialDeltaTheta( getOmegaN(), newAccel ) );
+    accelOver2 = newAccel / 2.0;
+    rate.reset( newAccel, getOmegaN() + accelOver2 );
 }
