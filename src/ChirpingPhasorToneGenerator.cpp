@@ -62,6 +62,10 @@ FlyingPhasorElementType ChirpingPhasorToneGenerator::getSample()
 
 void ChirpingPhasorToneGenerator::modifyAccel( double newAccel )
 {
-    accelOver2 = newAccel / 2.0;
-    rate.reset( newAccel, getOmegaBar() - accelOver2 );
+    // Capture omega value of next sample in the pipeline at current acceleration.
+    // This is essentially a new omega zero value.
+    const auto omegaN = getOmegaBar() - accelOver2;
+
+    // Update acceleration divided by 2 attribute, and reset the rate phasor.
+    rate.reset( newAccel, omegaN + ( accelOver2 = newAccel / 2.0 ) );
 }
