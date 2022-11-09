@@ -6,8 +6,10 @@ int main()
 {
     // An arbitrary epoch dwell in samples.
     constexpr size_t NUM_SAMPLES = 8192;
+    constexpr double accel = M_PI / NUM_SAMPLES;
+    constexpr double accelOverTwo = accel / 2.0;
 
-    ReiserRT::Signal::ChirpingPhasorToneGenerator chirpGen{ M_PI / NUM_SAMPLES };
+    ReiserRT::Signal::ChirpingPhasorToneGenerator chirpGen{ accel };
 
 
     // Write to standard out. It can be redirected.
@@ -15,7 +17,7 @@ int main()
     std::cout.precision(6);
     for ( size_t n = 0; 10 != n; ++n  )
     {
-        auto omegaN = chirpGen.getOmegaN();
+        auto omegaN = chirpGen.getOmegaBar() - accelOverTwo;
         auto sample = chirpGen.getSample();
         std::cout
                 << "Sample: " << n

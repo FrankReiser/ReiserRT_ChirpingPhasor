@@ -47,7 +47,7 @@ FlyingPhasorElementType ChirpingPhasorToneGenerator::getSample()
 {
     // We always start with the current phasor to nail the very first sample (s0)
     // and advance (rotate) afterwards.
-    auto retValue = phasor;
+    const auto retValue = phasor;
 
     // Now advance (rotate) the phasor by our "dynamic" rate (complex multiply).
     // We cache a copy of this rate as omegaN. This may be needed for a modAccel invocation
@@ -57,11 +57,15 @@ FlyingPhasorElementType ChirpingPhasorToneGenerator::getSample()
     // Perform normalization
     normalize();
 
-    return phasor;
+    return retValue;
 }
 
 void ChirpingPhasorToneGenerator::modifyAccel( double newAccel )
 {
-    accelOver2 = newAccel / 2.0;
-    rate.reset( newAccel, getOmegaN() + accelOver2 );
+    // Capture omega value of next sample in the pipeline at current acceleration.
+    // This is essentially a new omega zero value.
+    const auto omegaN = getOmegaBar() - accelOver2;
+
+    // Update acceleration divided by 2 attribute, and reset the rate phasor.
+    rate.reset( newAccel, omegaN + ( accelOver2 = newAccel / 2.0 ) );
 }
