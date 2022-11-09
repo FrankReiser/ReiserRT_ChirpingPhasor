@@ -79,25 +79,6 @@ namespace ReiserRT
             inline size_t getSampleCount() const { return sampleCounter; }
 
             /**
-             * @brief Obtain Next Omega Value (Angular Velocity)
-             *
-             * This operation returns the value of omega (angular velocity), representative of the next sample delivered.
-             * If invoked after construction or a reset, this should should be very close to argument omegaZero,
-             * within double precision accuracy constraints.
-             * If this value is allowed to exceed +/-pi radians per sample (nyquist rate), output will 'rollover'.
-             * In essence, positive frequency becomes negative, and negative frequency becomes positive.
-             * If it is expected in long running scenarios, that this might occur,
-             * this operation may be used to monitor angular velocity. Then acceleration may be halted or modified
-             * to prevent 'rollover' by using the modifyAccel operation.
-             *
-             * @return Returns the next value of omega (angular velocity) representative of the next sample to be delivered.
-             */
-            inline FlyingPhasorPrecisionType getOmegaN() const {
-                auto & omegaBarNext = rate.peakNextSample();
-                return std::arg( omegaBarNext ) - accelOver2;
-            }
-
-            /**
              * This operation returns the average angular velocity between the next two samples yet to be retrieved.
              * This value is mathematically referred to as 'omega bar'. The instantaneous angular velocities of
              * these next two samples can be deduced by adding or subtracting half the acceleration quantity last

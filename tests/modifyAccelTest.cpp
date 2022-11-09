@@ -23,7 +23,6 @@ int main()
         std::cout << std::fixed;
         std::cout.precision(7);
 
-#if 1
         // Get two samples with the initial acceleration value. We only need the second one.
         // we want to capture the omegaBar value before we actually get the second value.
         // The 'getOmegaBar' function obtains the average angular velocity between what we will call sample1
@@ -53,7 +52,7 @@ int main()
         const auto sample2 = chirpGen.getSample();
         const auto thetaS2 = std::arg(sample2 );
 
-        // Here we will look at the difference in the last two phase values and calculate an omegaS2.
+        // Here we will look at the difference in the last two phase values and calculate an omega.
         const auto omegaBar2 = deltaAngle(thetaS1, thetaS2 );
         const auto omegaS2 = omegaBar2 + initialAccel / 2.0;
         std::cout << "omegaBar2 = " << omegaBar2 << std::endl;
@@ -96,59 +95,47 @@ int main()
             break;
         }
 
-        // Now slow the thing down.
-
-#else
-        // Get data from each of the tone generator.
-        chirpGen.getSamples( chirpBuf.get(), NUM_SAMPLES );
-
-        // Get the Angular Velocity of the Next Sample to be retrieved.
-        auto omegaS1 = chirpGen.getOmegaBar() - initialAccel / 2;
-        std::cout << "First Epoch Retrieved. OmegaN = " << omegaS1 << std::endl;
-        if ( !inTolerance( omegaS1, initialAccel * NUM_SAMPLES, 1e-10 ) )
-        {
-            std::cout << "Chirping Phasor FAILS First Epoch Retrieval Omega Test, Expected: " << initialAccel * NUM_SAMPLES
-                      << ", Detected: " << omegaS1 << std::endl;
-            retCode = 1;
-            break;
-        }
-
-        // Modify Acceleration to 0 acceleration (coast)
-        chirpGen.modifyAccel();
-
-        // Get data from each of the tone generator.
-        chirpGen.getSamples( chirpBuf.get(), NUM_SAMPLES );
-
-        // Get the Angular Velocity of the Next Sample to be retrieved.
-        // It should be roughly the same as the original angular velocity.
-        auto omegaN2 = chirpGen.getOmegaN();
-        std::cout << "Second Epoch Retrieved. OmegaN = " << omegaN2 << std::endl;
-        if ( !inTolerance( omegaN2, omegaS1, 1e-4 ) )
-        {
-            std::cout << "Chirping Phasor FAILS Second Epoch Retrieval Omega Test, Expected: " << omegaS1
-                      << ", Detected: " << omegaN2 << std::endl;
-            retCode = 2;
-            break;
-        }
-
-        // Modify Acceleration to inverse half of original (decelerate more slowly).
+        // Now use the second acceleration value. This one should be negative and half the magnitude of the initial.
         chirpGen.modifyAccel( secondAccel );
 
-        // Get data from each of the tone generator.
-        chirpGen.getSamples( chirpBuf.get(), NUM_SAMPLES );
+        // Get next sample. This sample should reflect the zero (canceled) acceleration because it is 'baked' in.
+        // We should not see the effect of modifying acceleration until the sample after the next sample.
+        const auto sample4 = chirpGen.getSample();
+        const auto thetaS4 = std::arg(sample4 );
 
-        // Get the Angular Velocity of the Next Sample to be retrieved.
-        // It should be roughly half as the original velocity.
-        auto omegaN3 = chirpGen.getOmegaN();
-        std::cout << "Third Epoch Retrieved. OmegaN = " << omegaN3 << std::endl;
-        if ( !inTolerance( omegaN3, omegaS1 / 2.0, 1e-3 ) )
+        // Here we will look at the difference in the last two phase values and calculate an omega.
+        const auto omegaBar4 = deltaAngle( thetaS3, thetaS4 );
+        const auto omegaS4 = omegaBar4 - 0 / 2.0;        // We had formerly halted acceleration.
+        std::cout << "omegaBar4 = " << omegaBar4 << std::endl;
+        std::cout << "omegaS4 = " << omegaS4 << std::endl;
+        std::cout << "thetaS4 = " << thetaS4 << std::endl;
+        if ( !inTolerance( omegaS4, omegaS3, 1e-15 ) )
         {
-            std::cout << "Chirping Phasor FAILS Third Epoch Retrieval Omega Test, Expected: " << omegaS1 / 2.0
-                      << ", Detected: " << omegaN3 << std::endl;
-            retCode = 3;
+            std::cout << "Chirping Phasor FAILS omegaS4 Test, Expected: " << omegaS3
+                      << ", Detected: " << omegaS4 << std::endl;
+            retCode = 5;
             break;
         }
-#endif
+
+        // The next sample we retrieve should now reflect the second acceleration value.
+        const auto omegaBar5 = chirpGen.getOmegaBar();
+        const auto omegaS5 = omegaBar5 - secondAccel / 2.0;
+        const auto sample5 = chirpGen.getSample();
+        const auto thetaS5 = std::arg( sample5 );
+        std::cout << "omegaBar5 = " << omegaBar5 << std::endl;
+        std::cout << "omegaS5 = " << omegaS5 << std::endl;
+        std::cout << "thetaS5 = " << thetaS5 << std::endl;
+        const double expectedDeltaTheta5 = omegaS4 + secondAccel / 2.0;
+        std::cout << "expectedDeltaTheta5 = " << expectedDeltaTheta5 << std::endl;
+        const auto dTheta5 = deltaAngle(thetaS4, thetaS5 );
+        if ( !inTolerance(dTheta5, expectedDeltaTheta5, 1e-15 ) )
+        {
+            std::cout << "Chirping Phasor FAILS dTheta5 Test, Expected: " << expectedDeltaTheta5
+                      << ", Detected: " << dTheta5 << std::endl;
+            retCode = 6;
+            break;
+        }
+
     } while (false);
 
     return retCode;
