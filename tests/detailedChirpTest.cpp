@@ -44,7 +44,7 @@ int main( int argc, char * argv[] )
     using SampleType = ReiserRT::Signal::FlyingPhasorElementType;
     std::unique_ptr< SampleType[] > chirpBuf{ new SampleType[ NUM_SAMPLES ] };
 
-    // Get data from each of the tone generators.
+    // Get data from each of the tone generator.
     chirpGen.getSamples( chirpBuf.get(), NUM_SAMPLES );
 
     // Testing

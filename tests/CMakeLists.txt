@@ -15,3 +15,9 @@ add_test( NAME runDetailedChirpTest4 COMMAND $<TARGET_FILE:detailedChirpTest> --
 add_test( NAME runDetailedChirpTest5 COMMAND $<TARGET_FILE:detailedChirpTest> --omegaZero=0.5 --phi=-0.5 )
 add_test( NAME runDetailedChirpTest6 COMMAND $<TARGET_FILE:detailedChirpTest> --omegaZero=-0.5 --phi=0.5 )
 add_test( NAME runDetailedChirpTest7 COMMAND $<TARGET_FILE:detailedChirpTest> --omegaZero=-0.5 --phi=-0.5 )
+
+add_executable( modifyAccelTest "" )
+target_sources( modifyAccelTest PRIVATE modifyAccelTest.cpp)
+target_include_directories( modifyAccelTest PUBLIC ../src ../testUtilities )
+target_link_libraries( modifyAccelTest ReiserRT_ChirpingPhasor TestUtilities )
+add_test( NAME runModifyAccelTest COMMAND $<TARGET_FILE:modifyAccelTest> )
