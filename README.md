@@ -20,10 +20,11 @@ and a little "loving care". It is essentially a reimplementation of FlyingPhasor
 FlyingPhasorToneGenerator as a dynamic rate variable.
 
 Care must be exercised to ensure that the dynamic rate variable
-does not cross the nyquist point over the course of usage [document effect]. Otherwise, it is immune from
-domain range limits since it does not track, or care about, "cycles".
-Note that this is not necessarily true for implementations of std::sin and std::cos as large radian input
-values may result in instability.
+does not cross the nyquist point over the course of usage. If this is allowed to occur, positive frequency rolls over 
+to negative and, in decelerating cases, negative frequency becomes positive. Otherwise, it is immune from
+domain range limits since it does not track, or care about, "cycles". Angular velocity may be monitored via the
+`getOmegaBar` operation, which returns the mean average velocity between the next two samples delivered.
+Acceleration may be halted or otherwise modified via the `modifyAccel` operation.
 
 ## Details
 A little more needs to be said regarding the "loving care" mentioned above.
@@ -45,7 +46,7 @@ never mind the concurrency issues. Have threads use their own unique instances.
 
 # Acknowledgements
 As with ReiserRT_FlyingPhasor, this algorithm was derived from something I saw on StackExchange. It however was
-a non-chirping variety. This chirping variety is a compounding of that algorithm to achieve the dynamic rate.
+a non-chirping variety. This chirping variety is a compounding of that algorithm to achieve a dynamic rate.
 It is essentially a FlyingPhasorToneGenerator within a FlyingPhasorToneGenerator.
 
 ## Building and Installation
