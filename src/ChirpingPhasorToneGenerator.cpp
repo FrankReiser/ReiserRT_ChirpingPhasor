@@ -34,8 +34,6 @@ void ChirpingPhasorToneGenerator::getSamples( FlyingPhasorElementBufferTypePtr p
         *pElementBuffer++ = phasor;
 
         // Now advance (rotate) the phasor by our "dynamic" rate (complex multiply).
-        // We cache a copy of this rate as omegaN. This may be needed for a modAccel invocation
-        // or client query.
         phasor *= rate.getSample();
 
         // Perform normalization
@@ -50,8 +48,6 @@ FlyingPhasorElementType ChirpingPhasorToneGenerator::getSample()
     const auto retValue = phasor;
 
     // Now advance (rotate) the phasor by our "dynamic" rate (complex multiply).
-    // We cache a copy of this rate as omegaN. This may be needed for a modAccel invocation
-    // or client query.
     phasor *= rate.getSample();
 
     // Perform normalization
