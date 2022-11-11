@@ -64,7 +64,6 @@ generate_export_header( ${PROJECT_NAME}
 # We want to add this export header file to the public headers specification so that it gets installed
 # with the rest of the headers that get install. Additionally, we want to hide any API functions
 # that are not explicitly exported.
-get_target_property( _tmp ${PROJECT_NAME} PUBLIC_HEADER )
 set_target_properties( ${PROJECT_NAME}
         PROPERTIES
         CXX_VISIBILITY_PRESET hidden

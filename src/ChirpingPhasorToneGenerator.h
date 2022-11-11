@@ -141,7 +141,7 @@ namespace ReiserRT
         private:
             FlyingPhasorPrecisionType accelOver2;   //!< A useful internal quantity.
             FlyingPhasorToneGenerator rate;         //!< Dynamic angular rate provider (sample to sample, omegaBar)
-            FlyingPhasorElementType phasor;         //!< Current phase angle
+            FlyingPhasorElementType phasor;         //!< Phase angle of next sample.
             size_t sampleCounter;                   //!< Tracks sample count used or renormalization purposes.
         };
     }

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(
 	ReiserRT_ChirpingPhasor
-	VERSION 1.1.1
+	VERSION 1.1.2
 	DESCRIPTION "ReiserRT Complex Chirping Phasor Tone Generator" )
 
 # Set up compiler requirements
