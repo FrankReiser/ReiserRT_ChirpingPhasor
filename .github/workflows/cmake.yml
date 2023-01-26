@@ -27,7 +27,11 @@ jobs:
     # This is acceptable as long as it remains small and timely.
     - name: Clone, Configure, Build and Install Dependency
       run: |
-        pwd
+        cd ..
+        git clone https://github.com/FrankReiser/ReiserRT_FlyingPhasor.git
+        cd ReiserRT_FlyingPhasor
+        git status
+        
         
 #    - name: Configure CMake
 #      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
