@@ -2,6 +2,8 @@
 
 Frank Reiser's C++11 implementation of a fast and accurate, "chirping" sin/cos waveform pair (I/Q) generator.
 This library component is dependent on the ReiserRT_FlyingPhasor shared object library.
+This component has been tested to be interface-able with C++20 compiles.
+Note that the compiled library code is built using the c++11 standard.
 
 ## Overview
 
