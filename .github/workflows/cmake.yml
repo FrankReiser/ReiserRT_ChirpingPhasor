@@ -22,7 +22,7 @@ jobs:
     # I do not know all of what this does, so I am leaving it as the first step.
     - uses: actions/checkout@v3
 
-    # We are dependent on ReiserRT_ChripingPhasor. Until we have some sort of build artifact
+    # We are dependent on ReiserRT_FlyingPhasor. Until we have some sort of build artifact
     # in place (rpm file), we will just clone, configure, build and install it.
     # This is acceptable for now and for as long as it remains small and timely.
     - name: Clone, Configure, Build and Install Dependency
