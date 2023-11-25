@@ -19,9 +19,10 @@ namespace ReiserRT
         /**
          * @brief Chirping Phasor Tone Generator
          *
-         * This was developed to replace multiple invocations of, cos( f(s) + phi ) + j*sin( f(s) + phi ),
-         * where f(s) is a second order function of sample number in the form f(s) = omega0 * s + 0.5 * accel * s^2.
-         * It provides the classic 'chirp' of a linearly increasing frequency starting from omega0, and
+         * This class was developed to replace multiple invocations of, cos( omega(s) + phi ) + j*sin( omega(s) + phi ),
+         * where omega(s) is a second order function of sample number in the form,
+         * omega(s) = omega0 * s + 0.5 * accel * s^2, with an accelerating rotating phasor.
+         * This provides the classic linear 'chirp' with increasing frequency starting from omega0, and
          * accelerating (or decelerating) from omega0 at a constant acceleration. It makes usage of an internal
          * ReiserRT FlyingPhasorToneGenerator instance to provide a dynamic rate. Otherwise, it's implementation
          * looks almost identical to that of ReiserRT FlyingPhasorToneGenerator which has a fixed rate.
@@ -54,6 +55,14 @@ namespace ReiserRT
              */
             void getSamples( FlyingPhasorElementBufferTypePtr pElementBuffer, size_t numSamples );
 
+            /**
+             * @brief Get Sample Operation
+             *
+             * This operation deliver a single samples from the tone generator. The sample is unscaled
+             * (i.e., a magnitude of one).
+             *
+             * @return Returns next sample value.
+             */
             FlyingPhasorElementType getSample();
 
             /**
