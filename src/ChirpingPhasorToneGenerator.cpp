@@ -22,7 +22,7 @@ void ChirpingPhasorToneGenerator::reset( double accel, double omegaZero, double 
 {
     // Our `phasor` represents our output, the next sample to be retrieved. This
     // is simply initialized with a magnitude of 1.0 at starting phase `phi`.
-    phasor = std::polar(1.0, phi );
+    phasor = std::polar( 1.0, phi );
 
     // We store `accelOver2` as it is needed within the `modifyAccel` operation.
     // It is also used to initialize our `rate` attribute below.

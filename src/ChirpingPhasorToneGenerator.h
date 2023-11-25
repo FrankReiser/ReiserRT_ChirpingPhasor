@@ -121,6 +121,14 @@ namespace ReiserRT
              */
             void modifyAccel( double newAccel=0 );
 
+            /**
+             * @brief Peek Next Sample
+             *
+             * This operation exists for uses cases, where querying the current phase of an instance is necessary
+             * without 'working' the machine. The phasor state remains unchanged.
+             */
+            inline const FlyingPhasorElementType & peekNextSample() const { return phasor; }
+
         private:
             /**
              * @brief The Normalize Operation.
