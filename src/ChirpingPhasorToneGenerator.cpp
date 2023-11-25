@@ -38,10 +38,10 @@ void ChirpingPhasorToneGenerator::reset( double accel, double omegaZero, double 
     // just like our rate, its internal rate attribute does not affect its first sample delivered.
     // Its first sample delivered is set by its initial phase. This first sample must advance
     // our `phasor` by an omegaBar value equivalent to `omegaZero + accelOver2` for the second sample
-    // retrieved from `phasor`.
+    // retrieved from our `phasor`.
     //
-    // Post initialization, our rate attribute functions as an angular velocity integrator.
-    // implementing, omega(s) = omega0 * s + 0.5 * accel * s^2.
+    // Post initialization, our rate attribute functions as an angular velocity integrator,
+    // effectively implementing, omega(s) = omega0 * s + 0.5 * accel * s^2, via accumulation.
     rate.reset( accel, omegaZero + accelOver2 );
 
     // Sample counter starts at zero.
