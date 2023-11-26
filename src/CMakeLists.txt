@@ -4,7 +4,7 @@ add_library( ${PROJECT_NAME} SHARED "" )
 
 # We are dependent on ReiserRT_FlyingPhasor shared library package.
 # Ensure we specify the Major.Minor version we want.
-find_package( ReiserRT_FlyingPhasor 2.3 CONFIG REQUIRED )
+find_package( ReiserRT_FlyingPhasor 3.0 CONFIG REQUIRED )
 if ( ReiserRT_FlyingPhasor_FOUND )
 	message( STATUS "Found ReiserRT_FlyingPhasor!" )
 endif()

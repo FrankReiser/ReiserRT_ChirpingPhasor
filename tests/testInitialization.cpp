@@ -139,7 +139,8 @@ int main()
                 break;
             }
 
-            // The second sample should be advanced by phi plus omegaZero plus accel over two.
+            // The second sample should be advanced by phi plus omegaZero plus accel over two
+            // and a mag of one
             phase = std::arg( pElementBuf[1] );
             auto expectedPhase = phi + omegaZero + accel / 2.0;
             if ( !inTolerance( phase, expectedPhase, 1e-12 ) )
@@ -147,6 +148,14 @@ int main()
                 std::cout << "Second Sample Phase: " <<  phase << " out of Tolerance! Should be: "
                           << expectedPhase << std::endl;
                 retCode = 11;
+                break;
+            }
+            mag = std::abs( pElementBuf[1] );
+            if ( !inTolerance( mag, 1.0, 1e-12 ) )
+            {
+                std::cout << "Second Sample Magnitude: " <<  mag << " out of Tolerance! Should be: "
+                          << 1.0 << std::endl;
+                retCode = 12;
                 break;
             }
 
@@ -159,7 +168,7 @@ int main()
                 {
                     std::cout << "Get Single Sample failed at index " << i << ". Expected " << pElementBuf[i]
                               << ", obtained " << sample << std::endl;
-                    retCode = 12;
+                    retCode = 13;
                     break;
                 }
             }
@@ -170,3 +179,4 @@ int main()
     exit( retCode );
     return retCode;
 }
+

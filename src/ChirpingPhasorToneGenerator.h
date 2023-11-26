@@ -102,7 +102,7 @@ namespace ReiserRT
              * @return Returns the average angular velocity between the next two, yet to be retrieved, samples.
              */
             inline FlyingPhasorPrecisionType getOmegaBar() const {
-                return std::arg( rate.peakNextSample() );
+                return std::arg( rate.peekNextSample() );
             }
 
             /**
