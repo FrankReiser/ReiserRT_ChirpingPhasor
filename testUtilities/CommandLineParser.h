@@ -31,7 +31,7 @@ private:
     double accelIn{ M_PI / 16384 };
     double omegaZeroIn{ 0.0 };
     double phiIn{ 0.0 };
-    unsigned long chunkSizeIn{ 4096 }2
+    unsigned long chunkSizeIn{ 4096 };
     unsigned long numChunksIn{ 1 };
     unsigned long skipChunksIn{ 0 };
     bool helpFlagIn{ false };
