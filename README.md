@@ -5,7 +5,7 @@ This library component is dependent on the ReiserRT_FlyingPhasor shared object l
 
 ## Overview
 
-This tone generator evolved out of a desire to generate complex exponential waveforms (sinusoids) fast and accurately,
+This tone generator evolved out of a desire to generate complex exponential waveforms (sinusoids) fast and accurate,
 which would increase (or decrease) linearly in frequency over the course of time (samples). 
 The traditional way of doing this, involved repeated calls to sin and cos functions with an accelerating, radian input argument.
 This produces accurate results, at least over a limited domain interval. However, it is anything but fast.
@@ -53,7 +53,7 @@ with the project. We generated 1024 samples with an acceleration of pi/16384 rad
 with an omega zero of of zero and a starting phase of zero.
 This data is plotted below:
 
-Figure 1 - Example Flying Phasor Sample Series Data
+Figure 1 - Example Chirping Phasor Sample Series Data
 
 ![Figure 1](graphics/figure1.svg)
 
