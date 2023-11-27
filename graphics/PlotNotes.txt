@@ -1,0 +1,32 @@
+# I wrote this, so I can remember how I accomplished the graphics in the README
+# in case I ever need to redo them. The project needs to be built and ideally installed
+# beforehand.
+
+################### FIGURE 1 #######################
+# To Generate the "Figure 1 - Example Chirping Phasor Sample Series Data" graphic contained in the README file,
+#  I used the below command off in some directory outside the source tree:
+streamChirpingPhasor --includeX --streamFormat=b32 --chunkSize=1024 > chirpingPhasorB32.in
+
+# The output binary file contains three binary columns (sampleNum, real, imaginary) for 1024 samples.
+# The data is in 32 bit precision and by default has a acceleration of pi/16384 rads/sample^2,
+# an omegaZero of zero and a phase of zero. Note that 32 bit precision is more than adequate for a plot.
+
+# In the same directory where the file 'chirpingPhasorB32.in' sits, enter gnuplot.
+# You will need gnuplot to be installed obviously to do this.
+gnuplot
+
+set term svg size 520, 360 font "Helvetica,12" background rgb "grey90"
+set output 'figure1.svg'
+set xrange [0:1023]
+set yrange [-1.5:1.5]
+set xtics 128
+set ytics 0.5
+set grid xtics
+set grid ytics
+set xlabel "Sample Number (n)"
+set ylabel "Amplitude"
+set title "ChirpingPhasor accel=pi/16384, omega0=0.0, phi=0.0"
+set title "ChirpingPhasor accel=pi/16384 rads/sample^2, omega0=0.0, phi=0.0"
+
+# This is one long line, not two lines. Output goes directly to the file 'figure1.svg'.
+plot 'chirpingPhasorB32.in' binary format="%uint%float%float" using 1:3 with lines title "imag(n)", 'chirpingPhasorB32.in' binary format="%uint%float%float" using 1:2 with dots title "real(n)"
