@@ -7,6 +7,17 @@ target_compile_options( streamChirpingPhasor PRIVATE
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>
 )
 
+add_executable( streamExpoChirpingPhasor "" )
+target_sources( streamExpoChirpingPhasor PRIVATE streamExpoChirpingPhasor.cpp)
+target_include_directories( streamExpoChirpingPhasor PUBLIC ../src ../testUtilities )
+target_link_libraries( streamExpoChirpingPhasor ReiserRT_ChirpingPhasor TestUtilities )
+#[[
+target_compile_options( streamExpoChirpingPhasor PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>
+)
+#]]
+
 # What this does is set up a relative path where we expect our custom libraries to be
 # It will be used to patch the installation to find libraries relative to the binary.
 file( RELATIVE_PATH _rel ${CMAKE_INSTALL_PREFIX}/${INSTALL_BINDIR} ${CMAKE_INSTALL_PREFIX})
