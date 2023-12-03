@@ -131,18 +131,40 @@ int main( int argc, char * argv[] )
     testTraditionalExpoPhasorDefaults();    // Checks
     testTraditionalExpoPhasorPhiOnly();     // Checks
     testTraditionalExpoPhasorOmegaZero();   // Checks
-
-#if 0
-    ChirpingPhasorToneGenerator chirpingPhasorToneGenerator{M_PI / 16384};
-    auto sample = chirpingPhasorToneGenerator.getSample();
-    std::cout << "Chirp theta0 = " << std::arg( sample ) << std::endl;
-    sample = chirpingPhasorToneGenerator.getSample();
-    std::cout << "Chirp theta1 = " << std::arg( sample ) << std::endl;
-    sample = chirpingPhasorToneGenerator.getSample();
-    std::cout << "Chirp theta2 = " << std::arg( sample ) << std::endl;
-#endif
     testTraditionalExpoPhasorAccelZero();   // Checks
     testTraditionalExpoPhasorAccelDot();    // Agrees with formula but is the formula good. I think it is.
+
+#if 1
+    ChirpingPhasorToneGenerator chirpingPhasorToneGenerator{M_PI / 16384};
+    auto omegaBar = chirpingPhasorToneGenerator.getOmegaBar();
+    auto sample = chirpingPhasorToneGenerator.getSample();
+    std::cout << "Chirp omegaBar0 = " << omegaBar << std::endl;
+    std::cout << "Chirp theta0 = " << std::arg( sample ) << std::endl;
+    omegaBar = chirpingPhasorToneGenerator.getOmegaBar();
+    sample = chirpingPhasorToneGenerator.getSample();
+    std::cout << "Chirp omegaBar1 = " << omegaBar << std::endl;
+    std::cout << "Chirp theta1 = " << std::arg( sample ) << std::endl;
+    omegaBar = chirpingPhasorToneGenerator.getOmegaBar();
+    sample = chirpingPhasorToneGenerator.getSample();
+    std::cout << "Chirp omegaBar2 = " << omegaBar << std::endl;
+    std::cout << "Chirp theta2 = " << std::arg( sample ) << std::endl;
+#endif
+
+    ///@note Notes to self:
+    ///For an expo chirp, a ChirpingPhasor could serve as 'rate' supplier for accelDot. This should work.
+    ///For the 'phasor', it's almost a reimplementation of the chirping phasor.
+    ///Should I use inheritance? No, chirping phasor was not really intended to be used that way.
+    ///Should I aggregate one? No, because it cannot be controlled efficiently. See above.
+    ///None of this addresses the 'rate' supplier for accelZero. We were talking about 'phasor',
+    ///which at the end of all this is just a FlyingPhasorElementType (complex<double>).
+    ///Here is what I see:
+    ///1. The 'phasor', FlyingPhasorElementType
+    ///2. The 'rateAccelDot', ChirpingPhasor
+    ///3. The 'rateAccelZero', FlyingPhasor
+    ///How to initialize all of these? I do not know yet.
+    /// The 'phasor' is std::polar(phi)
+    /// The 'rateAccelZero', probably just like we did for ChirpingPhasor 'rate' variable.
+    /// The 'rateAccelDot', This is the big unknown. Going to need to understand this thoroughly.
 
     return 0;
     exit( 0 );
