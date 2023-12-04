@@ -124,17 +124,9 @@ void testTraditionalExpoPhasorAccelDot()
     std::cout << std::endl;
 }
 
-
-
-int main( int argc, char * argv[] )
+void testExistingChirpingPhasorAccelZero()
 {
-    testTraditionalExpoPhasorDefaults();    // Checks
-    testTraditionalExpoPhasorPhiOnly();     // Checks
-    testTraditionalExpoPhasorOmegaZero();   // Checks
-    testTraditionalExpoPhasorAccelZero();   // Checks
-    testTraditionalExpoPhasorAccelDot();    // Agrees with formula but is the formula good. I think it is.
-
-#if 1
+    std::cout << "Testing Existing Chirping Phasor accelZero only" << std::endl;
     ChirpingPhasorToneGenerator chirpingPhasorToneGenerator{M_PI / 16384};
     auto omegaBar = chirpingPhasorToneGenerator.getOmegaBar();
     auto sample = chirpingPhasorToneGenerator.getSample();
@@ -148,16 +140,57 @@ int main( int argc, char * argv[] )
     sample = chirpingPhasorToneGenerator.getSample();
     std::cout << "Chirp omegaBar2 = " << omegaBar << std::endl;
     std::cout << "Chirp theta2 = " << std::arg( sample ) << std::endl;
+    std::cout << std::endl;
+}
+
+void testFlyingPhasorAccelDot()
+{
+    double accelDot = M_PI / 16384;
+
+    std::cout << "Developing Flying Phasor Accel Dot" << std::endl;
+    ChirpingPhasorToneGenerator accelRate{ accelDot, 0.0, accelDot };
+    FlyingPhasorElementType omegaBarRate{ std::polar( 1.0, accelDot / 4.0 ) };
+
+    std::cout << "Accel Experiment omegaBar0 = " << std::arg( omegaBarRate ) << std::endl;
+    omegaBarRate *= accelRate.getSample();
+    std::cout << "Accel Experiment omegaBar1 = " << std::arg( omegaBarRate ) << std::endl;
+    omegaBarRate *= accelRate.getSample();
+    std::cout << "Accel Experiment omegaBar2 = " << std::arg( omegaBarRate ) << std::endl;
+    omegaBarRate *= accelRate.getSample();
+    std::cout << "Accel Experiment omegaBar3 = " << std::arg( omegaBarRate ) << std::endl;
+
+    std::cout << std::endl;
+}
+
+
+int main( int argc, char * argv[] )
+{
+    std::cout << std::scientific;
+    std::cout.precision(17);
+
+    testTraditionalExpoPhasorDefaults();    // Checks
+    testTraditionalExpoPhasorPhiOnly();     // Checks
+    testTraditionalExpoPhasorOmegaZero();   // Checks
+    testTraditionalExpoPhasorAccelZero();   // Checks
+    testTraditionalExpoPhasorAccelDot();    // Agrees with formula but is the formula good? I think it is.
+
+    testExistingChirpingPhasorAccelZero();  // This looks good but of course, it's been tested already.
+
+    testFlyingPhasorAccelDot();
+#if 1
 #endif
 
     ///@note Notes to self:
     ///For an expo chirp, a ChirpingPhasor could serve as 'rate' supplier for accelDot. This should work.
+    ///NO I DON'T THINK THAT IS ENOUGH.
+    ///
     ///For the 'phasor', it's almost a reimplementation of the chirping phasor.
     ///Should I use inheritance? No, chirping phasor was not really intended to be used that way.
     ///Should I aggregate one? No, because it cannot be controlled efficiently. See above.
     ///None of this addresses the 'rate' supplier for accelZero. We were talking about 'phasor',
     ///which at the end of all this is just a FlyingPhasorElementType (complex<double>).
     ///Here is what I see:
+
     ///1. The 'phasor', FlyingPhasorElementType
     ///2. The 'rateAccelDot', ChirpingPhasor
     ///3. The 'rateAccelZero', FlyingPhasor

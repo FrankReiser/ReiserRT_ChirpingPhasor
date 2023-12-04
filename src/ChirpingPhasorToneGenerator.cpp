@@ -12,7 +12,7 @@ using namespace ReiserRT::Signal;
 ChirpingPhasorToneGenerator::ChirpingPhasorToneGenerator( double accel, double omegaZero, double phi )
   : accelOver2{ accel / 2.0 }
   , rate{ accel, omegaZero + accelOver2 }
-  , phasor{ std::polar(1.0, phi ) }
+  , phasor{ std::polar( 1.0, phi ) }
   , sampleCounter{}
 {
     ///@see ChirpingPhasorToneGenerator::reset operation for an discussion on our initialization steps.
