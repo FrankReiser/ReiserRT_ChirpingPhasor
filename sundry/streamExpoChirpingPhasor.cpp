@@ -145,9 +145,42 @@ void testExistingChirpingPhasorAccelZero()
 
 void testFlyingPhasorAccelDot()
 {
-    double accelDot = M_PI / 16384;
+    constexpr double accelDot = M_PI / 16384;
 
     std::cout << "Developing Flying Phasor Accel Dot" << std::endl;
+#if 1
+    constexpr double accelDotOver2 = accelDot / 2.0;
+    constexpr double accelDotOver6 = accelDot / 6.0;
+    FlyingPhasorToneGenerator accelDotRate{ accelDot, accelDot };
+    FlyingPhasorElementType accelRate{ std::polar( 1.0, accelDot ) };
+    FlyingPhasorElementType omegaRate{ std::polar( 1.0, accelDotOver6 ) };
+    FlyingPhasorElementType theta{ std::polar(1.0, 0.0 ) };
+
+    ///@note Note to self: I think I've tricked it into spitting out the correct
+    ///first for samples through phase staging. The fifth sample is broke. This is obviously
+    ///more complicated than thought. It's all the delays built in. That worked with linear
+    ///chirping phasor but it doesn't not seem to be able to tolerate another layer. Can I eliminate
+    ///it???
+    for ( size_t n = 0; 5 != n; ++n )
+    {
+        std::cout << "AccelDot Experiment theta" << n << " = " << std::arg( theta ) << std::endl;
+//        std::cout << "AccelDot Experiment omega" << n << " = " << std::arg( omegaRate ) << std::endl;
+//        std::cout << "AccelDot Experiment accel" << n << " = " << std::arg( accelRate ) << std::endl;
+//        std::cout << "AccelDot Experiment accelDot" << n << " = " << std::arg( accelDotRate.peekNextSample() ) << std::endl;
+
+        // Advance
+        theta *= omegaRate;
+        omegaRate *= accelRate;
+        accelRate *= accelDotRate.getSample();
+
+    }
+
+//    std::cout << "AccelDot Experiment accelRate0 = " << std::arg( accelRate ) << std::endl;
+//    std::cout << "AccelDot Experiment accelBar1 = " << std::arg( accelDotRate.getSample() ) << std::endl;
+//    std::cout << "AccelDot Experiment accelBar2 = " << std::arg( accelDotRate.getSample() ) << std::endl;
+//    std::cout << "AccelDot Experiment accelBar3 = " << std::arg( accelDotRate.getSample() ) << std::endl;
+//    std::cout << "AccelDot Experiment accelBar4 = " << std::arg( accelDotRate.getSample() ) << std::endl;
+#else
     ChirpingPhasorToneGenerator accelRate{ accelDot, 0.0, accelDot };
     FlyingPhasorElementType omegaBarRate{ std::polar( 1.0, accelDot / 4.0 ) };
 
@@ -158,6 +191,7 @@ void testFlyingPhasorAccelDot()
     std::cout << "Accel Experiment omegaBar2 = " << std::arg( omegaBarRate ) << std::endl;
     omegaBarRate *= accelRate.getSample();
     std::cout << "Accel Experiment omegaBar3 = " << std::arg( omegaBarRate ) << std::endl;
+#endif
 
     std::cout << std::endl;
 }
