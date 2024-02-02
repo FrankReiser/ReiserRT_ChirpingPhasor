@@ -23,7 +23,7 @@ Care must be exercised to ensure that the dynamic rate variable
 does not cross the nyquist point over the course of usage. If this is allowed to occur, positive frequency rolls over 
 to negative and, in decelerating cases, negative frequency becomes positive. Otherwise, it is immune from
 domain range limits since it does not track, or care about, "cycles". Angular velocity may be monitored via the
-`getOmegaBar` operation, which returns the mean average velocity between the next two samples delivered.
+`getOmegaBar` operation, which returns the mean average velocity between the next two samples, next up for delivery.
 Acceleration may be halted or otherwise modified via the `modifyAccel` operation.
 
 ## Details
@@ -40,17 +40,17 @@ This tone generator performs this re-normalization every other sample. This was 
    a simple and inexpensive linear approximation is all that is required to maintain stability.
 
 Regarding the "state data", this tone generator was designed to generate a single chirp per instance.
-An instance is constructed with an initial acceleration, omega zero and a phase angle (phi).
+An instance is constructed with an initial acceleration, an omega zero, and a phase angle (phi).
 When an initial number of samples are requested from an instance, they are delivered
 from the starting phase angle at an accelerating radians per sample, rate. Subsequent sample requests,
 are delivered in phase (continuous) with the previous samples delivered. An instance
-may be "reset" however, to produce a different chirp. Resetting re-initializes all "state data"
+may be "reset" however, to produce a different chirp. Resetting re-initializes all state data
 as if the object were just constructed. The amount of state data maintained is fairly small.
 
 # Example Data Characteristics
 Here, we present some example data created with the 'streamChirpingPhasor' utility program included
 with the project. We generated 1024 samples with an acceleration of pi/16384 radians per sample squared,
-with an omega zero of of zero and a starting phase of zero.
+with an omega zero of zero, and a starting phase (phi) of zero.
 This data is plotted below:
 
 Figure 1 - Example Chirping Phasor Sample Series Data
@@ -58,8 +58,8 @@ Figure 1 - Example Chirping Phasor Sample Series Data
 ![Figure 1](graphics/figure1.svg)
 
 From the figure, we can see a linearly increasing frequency. The data is complex in nature. If you only
-need the imaginary value, that can be extracted. The real value is calculated simultaneously for free
-and may be useful for compensating for, or for creating doppler shifts with complex signal data.
+need the 'real' or 'imaginary' value, either can be extracted. They are calculated simultaneously for the
+price of one. For DSP applications, you most likely would require both.
 
 # Interface Compatibility
 This component has been tested to be interface-able with C++20 compiles. Note that the compiled library code
