@@ -58,8 +58,8 @@ Figure 1 - Example Chirping Phasor Sample Series Data
 ![Figure 1](graphics/figure1.svg)
 
 From the figure, we can see a linearly increasing frequency. The data is complex in nature. If you only
-need the imaginary value, that can be extracted. The real value is calculated simultaneously for free
-and may be useful for compensating for, or for creating doppler shifts with complex signal data.
+need the 'real' or 'imaginary' value, either can be extracted. They are calculated simultaneously for the
+price of one. For DSP applications, you most likely would require both.
 
 # Interface Compatibility
 This component has been tested to be interface-able with C++20 compiles. Note that the compiled library code
