@@ -25,7 +25,6 @@ set grid xtics
 set grid ytics
 set xlabel "Sample Number (n)"
 set ylabel "Amplitude"
-set title "ChirpingPhasor accel=pi/16384, omega0=0.0, phi=0.0"
 set title "ChirpingPhasor accel=pi/16384 rads/sample^2, omega0=0.0, phi=0.0"
 
 set style line 1 linecolor rgb '#0060ad'
